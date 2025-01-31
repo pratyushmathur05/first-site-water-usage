@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Usage Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #cdd6e3;
+            font-family: 'Roboto', sans-serif;
+        }
+        h1, h2 {
+            font-family: 'Arial', sans-serif;
+            color: #2d3e50;
+        }
+        h3 {
+            font-family: 'Arial', sans-serif;
+            color: #5d6d7e;
+        }
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #2d3e50;
+        }
+        .btn-primary {
+            border-radius: 20px;
+            padding: 12px 25px;
+        }
+        .btn-primary:hover {
+            background-color: #e7edf3;
+            transition: background-color 0.3s ease;
+        }
+        .form-control-range {
+            border-radius: 10px;
+        }
+        .form-control-range:focus {
+            box-shadow: 0 0 0 0.25rem rgba(38, 143, 255, 0.25);
+        }
+        .form-group label {
+            font-weight: 500;
+        }
+        .graph-container {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .graph-container .col-md-6 {
+            margin-bottom: 2rem;
+        }
+        .graph-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            transition: transform 0.3s ease-in-out;
+        }
+        .graph-container img:hover {
+            transform: scale(1.05);
+        }
+        .table-responsive {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            border-radius: 10px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="text-center mb-4">Water Usage Tracker</h1>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h3 class="card-title">Enter Today's Water Usage</h3>
+                <form method="POST" action="/">
+                    <div class="form-group">
+                        <label for="cooking">Cooking (liters)</label>
+                        <input type="range" class="form-control-range" id="cooking" name="cooking" min="0" max="100" value="0">
+                        <small><span id="cooking-value">0</span> liters</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="bathing">Bathing (liters)</label>
+                        <input type="range" class="form-control-range" id="bathing" name="bathing" min="0" max="100" value="0">
+                        <small><span id="bathing-value">0</span> liters</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="laundry">Laundry (liters)</label>
+                        <input type="range" class="form-control-range" id="laundry" name="laundry" min="0" max="100" value="0">
+                        <small><span id="laundry-value">0</span> liters</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="cleaning">Cleaning (liters)</label>
+                        <input type="range" class="form-control-range" id="cleaning" name="cleaning" min="0" max="100" value="0">
+                        <small><span id="cleaning-value">0</span> liters</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="drinking">Drinking (liters)</label>
+                        <input type="range" class="form-control-range" id="drinking" name="drinking" min="0" max="100" value="0">
+                        <small><span id="drinking-value">0</span> liters</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <h2 class="mt-5">Water Usage History</h2>
+        <div class="table-responsive p-3 bg-white shadow-sm rounded">{{ data|safe }}</div>
+
+        <h2 class="mt-5">Total Water Usage</h2>
+        <ul class="bg-white p-3 rounded shadow-sm">
+            {% for key, value in total_usage.items() %}
+                <li><strong>{{ key.capitalize() }}:</strong> {{ value }} liters</li>
+            {% endfor %}
+        </ul>
+
+        <h2 class="mt-5">Average Water Usage</h2>
+        <ul class="bg-white p-3 rounded shadow-sm">
+            {% for key, value in avg_usage.items() %}
+                <li><strong>{{ key.capitalize() }}:</strong> {{ value|round(2) }} liters/day</li>
+            {% endfor %}
+        </ul>
+
+        <h2 class="mt-5">Usage Breakdown</h2>
+        <div class="row graph-container">
+            <div class="col-md-6">
+                <h3>Pie Chart</h3>
+                <img src="{{ pie_chart_url }}" alt="Water Usage Breakdown (Pie Chart)" class="img-fluid">
+            </div>
+            <div class="col-md-6">
+                <h3>Usage Trend (Line Graph)</h3>
+                <img src="{{ line_graph_url }}" alt="Water Usage Trend (Line Graph)" class="img-fluid">
+            </div>
+        </div>
+        <h2 class="text-center mt-5">Why and How to Save Water</h2>
+        <p class="text-center">Saving water is crucial for environmental sustainability. Here are some great resources to learn more:</p>
+        <ul class="list-unstyled text-center">
+            <li><a href="https://www.americanrivers.org/rivers/discover-your-river/top-10-ways-for-you-to-save-water-at-home/">Top 10 Ways to Save Water at Home</a> - American Rivers</li>
+            <li><a href="https://health.ucdavis.edu/blog/good-food/why-its-important-for-you-to-drink-water-and-stay-hydrated/2022/07">Why It's Important to Drink Water</a> - UC Davis Health</li>
+            <li><a href="https://www.wwf.org.uk/what-can-i-do/top-ten-water-saving-tips">Top Ten Water Saving Tips</a> - WWF</li>
+            <li><a href="https://www.watercalculator.org/">Water Conservation Calculator</a> - Water Footprint Network</li>
+            <li><a href="https://www.epa.gov/watersense/tips">WaterSense Tips</a> - US Environmental Protection Agency</li>
+            <li><a href="https://www.nrdc.org/stories/10-water-conservation-tips">10 Water Conservation Tips</a> - NRDC</li>
+        </ul>
+
+    </div>
+
+    <footer>
+        <p>© 2024 Water Usage Tracker. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Update slider value display
+        $('#cooking').on('input', function() { $('#cooking-value').text(this.value); });
+        $('#bathing').on('input', function() { $('#bathing-value').text(this.value); });
+        $('#laundry').on('input', function() { $('#laundry-value').text(this.value); });
+        $('#cleaning').on('input', function() { $('#cleaning-value').text(this.value); });
+        $('#drinking').on('input', function() { $('#drinking-value').text(this.value); });
+    </script>
+</body>
+</html>
