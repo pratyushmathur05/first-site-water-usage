@@ -1,9 +1,12 @@
 {
-    "version": 2,
-    "builds": [
-        {"src": "app.py", "use": "@vercel/python"}
-    ],
-    "routes": [
-        {"src": "/(.*)", "dest": "app.py"}
-    ]
+  "version": 2,  // Important: Keep this version or higher
+  "builds": [
+    { "src": "wsgi.py", "use": "@vercel/python" } // Replace wsgi.py with your main file if different.
+  ],
+    "functions": {
+      "api/**/*.py": {
+        "runtime": "@vercel/python",
+        "maxDuration": 300
+      }
+    }
 }
