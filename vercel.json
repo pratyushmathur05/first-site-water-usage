@@ -1,7 +1,7 @@
 {
-  "version": 2,  // Important: Keep this version or higher
+  "version": 2,  
   "builds": [
-    { "src": "wsgi.py", "use": "@vercel/python" } // Replace wsgi.py with your main file if different.
+    { "src": "wsgi.py", "use": "@vercel/python" } 
   ],
     "functions": {
       "api/**/*.py": {
